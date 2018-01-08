@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/HADR-hackathon.iml" filepath="$PROJECT_DIR$/HADR-hackathon.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ssta Hackathon.iml" filepath="$PROJECT_DIR$/ssta Hackathon.iml" />
     </modules>
   </component>
 </project>
