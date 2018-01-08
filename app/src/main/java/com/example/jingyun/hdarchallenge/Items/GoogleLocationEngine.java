@@ -1,5 +1,5 @@
 package com.example.jingyun.hdarchallenge.Items;
-/*
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
  * Created by Jing Yun on 8/1/2018.
  */
 
-/*
+
 public class GoogleLocationEngine extends LocationEngine implements LocationListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
     private static final String LOG_TAG = GoogleLocationEngine.class.getSimpleName();
 
@@ -163,4 +163,3 @@ public class GoogleLocationEngine extends LocationEngine implements LocationList
 
     }
 }
-*/
