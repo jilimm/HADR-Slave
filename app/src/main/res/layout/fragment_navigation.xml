@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="com.example.jingyun.hdarchallenge.Fragments.NavigationFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/map_mapView"
+        android:layout_width="match_parent"
+        android:layout_height="406dp"
+        mapbox:mapbox_cameraZoom="12" />
+
+    <Button
+        android:id="@+id/map_load_bttn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Retrieve Image" />
+
+
+    <TextView
+        android:id="@+id/map_notes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notes about the terrain" />
+
+
+
+</LinearLayout>
