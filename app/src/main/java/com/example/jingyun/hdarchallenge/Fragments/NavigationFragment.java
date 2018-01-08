@@ -106,8 +106,10 @@ public class NavigationFragment extends Fragment {
                 currentloc = location;
                 Toast.makeText(getActivity(), "curreloc_null "+String.valueOf(currentloc==null), Toast.LENGTH_SHORT).show();
                 Toast.makeText(getActivity(), currentloc.toString(), Toast.LENGTH_SHORT).show();
-                Log.i("NavFragonCreate",currentloc.toString());
                 locationManager.removeUpdates(this);
+
+                //once location is obtained, animate the map
+                setCameraPosition(currentloc);
             }
 
             @Override
@@ -226,8 +228,14 @@ public class NavigationFragment extends Fragment {
 
 
     private void setCameraPosition(Location location) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 13));
+        LatLng currentCoord  = new LatLng(location.getLatitude(), location.getLongitude());
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom( currentCoord, 18));
+        map.addMarker(new MarkerOptions()
+                .position(currentCoord)
+                .title("Current")
+                .snippet(String.valueOf(currentCoord.getLatitude())+","
+                        +String.valueOf(currentCoord.getLongitude())+","
+                        +String.valueOf(currentCoord.getAltitude())));
     }
 
 
