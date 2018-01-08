@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.jingyun.hdarchallenge.Items.GoogleLocationEngine;
 import com.example.jingyun.hdarchallenge.R;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -42,7 +43,7 @@ import java.util.List;
  * Use the {@link NavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NavigationFragment extends Fragment implements LocationEngineListener,PermissionsListener {
+public class NavigationFragment extends Fragment implements LocationEngineListener,PermissionsListener, GoogleApiClient. {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -60,6 +61,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private MapboxMap map;
     private LatLng destinationCoord;
     private Button loadBttn;
+    private GoogleApiClient mGoogleApiClient;
     private Location originLocation;
 
     public NavigationFragment() {
@@ -87,6 +89,10 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks()
+
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -209,6 +215,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         //locationEngine = GoogleLocationEngine.getLocationEngine(getActivity());
         locationEngine = GoogleLocationEngine.getLocationEngine(getActivity());
         Log.i("NavigationFrag", "1" );
+
         locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
         Log.i("NavigationFrag", "2" );
 
@@ -218,7 +225,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         Location lastLocation = locationEngine.getLastLocation();
 
         Log.i("NavigationFrag", "test" );
-        Log.i("NavigationFrag", String.valueOf(lastLocation==null) );
+        Log.i("NavigationFrag", "location_null "+String.valueOf(lastLocation==null) );
         if (lastLocation != null) {
             Log.i("NavigationFrag", lastLocation.toString() );
             Log.i("NavigationFrag", "here");
@@ -280,9 +287,12 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     public void onStart() {
         super.onStart();
         if (locationEngine != null) {
+            Log.i("NavFrag","heree1");
             locationEngine.requestLocationUpdates();
         }
         if (locationLayerPlugin != null) {
+            Log.i("NavFrag","heree2");
+
             locationLayerPlugin.onStart();
         }
         mapView.onStart();
@@ -292,9 +302,13 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     public void onStop() {
         super.onStop();
         if (locationEngine != null) {
+            Log.i("NavFrag","heree3");
+
             locationEngine.removeLocationUpdates();
         }
         if (locationLayerPlugin != null) {
+            Log.i("NavFrag","heree4");
+
             locationLayerPlugin.onStop();
         }
         mapView.onStop();
@@ -305,6 +319,8 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         super.onDestroy();
         mapView.onDestroy();
         if (locationEngine != null) {
+            Log.i("NavFrag","heree5");
+
             locationEngine.deactivate();
         }
     }

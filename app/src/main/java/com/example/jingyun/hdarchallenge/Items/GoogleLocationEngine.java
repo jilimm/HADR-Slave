@@ -1,5 +1,5 @@
 package com.example.jingyun.hdarchallenge.Items;
-
+/*
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
@@ -23,7 +23,8 @@ import java.lang.ref.WeakReference;
  * Created by Jing Yun on 8/1/2018.
  */
 
-public class GoogleLocationEngine extends LocationEngine implements LocationListener{
+/*
+public class GoogleLocationEngine extends LocationEngine implements LocationListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
     private static final String LOG_TAG = GoogleLocationEngine.class.getSimpleName();
 
     private static LocationEngine instance;
@@ -35,12 +36,10 @@ public class GoogleLocationEngine extends LocationEngine implements LocationList
         super();
         this.context = new WeakReference<>(context);
         googleApiClient = new GoogleApiClient.Builder(this.context.get())
-                .addConnectionCallbacks(connectionCallbacks)
-                .addOnConnectionFailedListener(connectionFailedListener)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        googleApiClient.connect();
-
     }
 
     public static synchronized LocationEngine getLocationEngine(Context context) {
@@ -58,11 +57,12 @@ public class GoogleLocationEngine extends LocationEngine implements LocationList
             Log.i("location engine","googleAPI"+String.valueOf(googleApiClient!=null));
             Log.i("location engine","googleAPInoconnect"+String.valueOf(!googleApiClient.isConnected()));
             googleApiClient.connect();
-            //TODO: google API client is attempting to connect at all
+            //TODO: google API client is attempting to connect
             Log.i("location engine","googleAPInull"+String.valueOf(googleApiClient==null));
-            Log.i("location engine","googleAPIconnecting"+String.valueOf(googleApiClient.isConnecting()));
+            Log.i("location engine","googleAPIconnecting "+String.valueOf(googleApiClient.isConnecting()));
 
         }
+
     }
 
     @Override
@@ -140,31 +140,27 @@ public class GoogleLocationEngine extends LocationEngine implements LocationList
         }
     }
 
-    private GoogleApiClient.ConnectionCallbacks connectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
-        @SuppressLint("MissingPermission")
-        @Override
-        public void onConnected(@Nullable Bundle bundle) {
-            getLastLocation();
-            Log.i("locationEngine","onConnected");
-            for (LocationEngineListener listener : locationListeners) {
-                listener.onConnected();
-            }
-        }
 
-        @Override
-        public void onConnectionSuspended(int cause) {
-            Log.i("locationEngine","onConnectionSuspended");
-            Log.d(LOG_TAG, "Connection suspended: " + cause);
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.i("LOCATIONENG","onConnected");
+        for (LocationEngineListener listener : locationListeners) {
+            listener.onConnected();
         }
-    };
+    }
 
-    private GoogleApiClient.OnConnectionFailedListener connectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
-        @SuppressLint("MissingPermission")
-        @Override
-        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-            Log.i("locationEngine", "onConnectionFailed");
-            Log.d(LOG_TAG, "Connection failed:" + connectionResult.getErrorMessage());
-        }
-    };
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i("LOCATIONENG","onConnectSus");
+        Log.d(LOG_TAG, "Connection suspended: " + cause);
 
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i("LOCATIONENG","onCnntFail");
+        Log.d(LOG_TAG, "Connection failed:" + connectionResult.getErrorMessage());
+
+    }
 }
+*/
