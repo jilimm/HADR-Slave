@@ -6,18 +6,34 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jingyun.hdarchallenge.R;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+//imports used for getting navigation route
+import com.mapbox.geojson.BoundingBox;
+import com.mapbox.geojson.Point;
+import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
+import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
+import com.mapbox.services.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.models.DirectionsRoute;
+import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
+import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
+import com.mapbox.services.commons.models.Position;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+//imports used to instantiate map in mapbox and track current user location
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -35,6 +51,9 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 import com.mapbox.services.android.telemetry.location.LostLocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
+
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 /**
@@ -56,16 +75,26 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    //things needed to create the view in the fragment
     private MapView mapView;
-    private PermissionsManager permissionsManager;
-    private LocationLayerPlugin locationPlugin;
-    private LocationEngine locationEngine;
     private MapboxMap map;
     private LatLng destinationCoord;
     private Button loadBttn;
+    private TextView etaText;
+    //things needed to get and update user current location
+    private PermissionsManager permissionsManager;
+    private LocationLayerPlugin locationPlugin;
+    private LocationEngine locationEngine;
     private Location currentLocation; //will be determine by locationEngine
 
-    private FusedLocationProviderClient mFuseLocationClient;
+    //things needed to create and draw the navigation route
+    private Position originPosition;
+    private Position destinationPosition;
+    private DirectionsRoute currentRoute;
+    private static final String TAG = "DirectionsActivity";
+    private NavigationMapRoute navigationMapRoute;
+
+
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -121,6 +150,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         //setting up things in xml file
         mapView = (MapView) rootView.findViewById(R.id.map_mapView);
         loadBttn = (Button) rootView.findViewById(R.id.map_load_bttn);
+        etaText = (TextView) rootView.findViewById(R.id.map_notes) ;
 
         //setting up the map
         Mapbox.getInstance(getActivity(), getString(R.string.mapbox_access_token));
@@ -131,16 +161,14 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
             public void onMapReady(MapboxMap mapboxMap) {
                 //setting up initial style of the map
                 map = mapboxMap;
-                mapboxMap.setStyleUrl(Style.SATELLITE);
+                mapboxMap.setStyleUrl(Style.SATELLITE_STREETS);
                 mapboxMap.addMarker(new MarkerOptions()
                         .position(destinationCoord)
                         .title("Destination")
                         .snippet(String.valueOf(destinationCoord.getLatitude())+","
                                 +String.valueOf(destinationCoord.getLongitude())+","
                                 +String.valueOf(destinationCoord.getAltitude())));
-                enableLocationPlugin();
-
-
+                enableLocationPlugin(); //get the user's current location and destination, zooms camera to appropriate level
             }
         });
 
@@ -148,7 +176,26 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         loadBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "Retreiving Satellite Image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "TEMP: navigation button", Toast.LENGTH_LONG).show();
+
+
+                //to launch navigation mode
+
+                /*
+                if (currentLocation!=null){
+                    String awsPoolId = null;
+
+                    boolean simulateRoute = true;
+
+                    // Call this method with Context from within an Activity
+                    NavigationLauncher.startNavigation(getActivity(), originPosition,destinationPosition, awsPoolId,simulateRoute);
+                }else{
+                    Toast.makeText(getActivity(), "Current Location cannot be obtained", Toast.LENGTH_SHORT).show();
+                    Log.i("Navigation Frag","current location null2");
+
+                }
+                */
+
             }
         });
 
@@ -218,15 +265,10 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         locationEngine.activate();
 
         Location lastLocation = locationEngine.getLastLocation();
-
-
         if (lastLocation != null) {
-
             currentLocation = lastLocation;
-            setCameraPosition(lastLocation);
+            Toast.makeText(getActivity(), "DETECTED"+currentLocation.toString(), Toast.LENGTH_SHORT).show();
         } else {
-            Log.i("NavigationFrag","location Engine null");
-            Log.i("NavigationFrag","locationEngine connected"+String.valueOf(locationEngine.isConnected()));
             locationEngine.addLocationEngineListener(this);
         }
     }
@@ -268,9 +310,14 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
+            Toast.makeText(getActivity(), "locationChanged", Toast.LENGTH_SHORT).show();
             currentLocation = location;
             setCameraPosition(location);
+            destinationPosition = Position.fromCoordinates(destinationCoord.getLatitude(),destinationCoord.getLongitude());
+            originPosition = Position.fromCoordinates(currentLocation.getLatitude(),currentLocation.getLongitude());
+            getRoute(originPosition,destinationPosition);
             locationEngine.removeLocationEngineListener(this);
+            Toast.makeText(getActivity(), "route obtained", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -332,6 +379,55 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         mapView.onSaveInstanceState(outState);
     }
 
+
+    //used to get Route
+
+    private void getRoute(Position origin, Position destination) {
+        NavigationRoute.builder()
+                .accessToken(Mapbox.getAccessToken())
+                .origin(Point.fromLngLat(origin.getLatitude(),origin.getLongitude(),origin.getAltitude()))
+                .destination(Point.fromLngLat(destination.getLatitude(),destination.getLongitude(),destination.getAltitude()))
+                .profile(DirectionsCriteria.PROFILE_WALKING)
+                .build()
+                .getRoute(new Callback<DirectionsResponse>() {
+                    @Override
+                    public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                        // You can get the generic HTTP info about the response
+                        Log.d(TAG, "Response code: " + response.code());
+                        if (response.body() == null) {
+                            Log.e(TAG, "No routes found, make sure you set the right user and access token.");
+                            return;
+                        } else if (response.body().routes().size() < 1) {
+                            Log.e(TAG, "No routes found");
+                            return;
+                        }
+
+                        currentRoute = response.body().routes().get(0);
+
+                        // Draw the route on the map
+                        if (navigationMapRoute != null) {
+                            Log.e(TAG, "navigationMapRoute!=null");
+                            navigationMapRoute.removeRoute();
+                        } else {
+                            Log.e(TAG, "make new NavigationMapRoute");
+                            navigationMapRoute = new NavigationMapRoute(null, mapView, map);
+                        }
+                        Log.e(TAG, "addingRoute");
+                        navigationMapRoute.addRoute(currentRoute);
+                        Log.e(TAG, "route added");
+                        Log.e(TAG, currentRoute.toString());
+                        Log.e(TAG, String.valueOf(currentRoute.duration()));
+                        etaText.setText("ETA :"+String.valueOf(currentRoute.duration())+"/n"+currentRoute.routeOptions());
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                        Log.i(TAG, "Error: " + throwable.getMessage());
+                    }
+                });
+    }
 
 
 
