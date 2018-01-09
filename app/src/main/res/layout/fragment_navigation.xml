@@ -11,8 +11,6 @@
         android:id="@+id/map_mapView"
         android:layout_width="match_parent"
         android:layout_height="406dp"
-        mapbox:mapbox_cameraTargetLat="40.73581"
-        mapbox:mapbox_cameraTargetLng="-73.99155"
         mapbox:mapbox_cameraZoom="12" />
 
     <Button

@@ -9,17 +9,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.jingyun.hdarchallenge.Items.GoogleLocationEngine;
 import com.example.jingyun.hdarchallenge.R;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -33,6 +32,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
+import com.mapbox.services.android.telemetry.location.LostLocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import java.util.List;
@@ -45,7 +45,7 @@ import java.util.List;
  * Use the {@link NavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NavigationFragment extends Fragment {
+public class NavigationFragment extends Fragment implements LocationEngineListener, PermissionsListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -58,14 +58,16 @@ public class NavigationFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private MapView mapView;
     private PermissionsManager permissionsManager;
-    private LocationLayerPlugin locationLayerPlugin;
+    private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
     private MapboxMap map;
     private LatLng destinationCoord;
     private Button loadBttn;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private Location currentloc;
+    private Location originLocation;
+
+    private FusedLocationProviderClient mFuseLocationClient;
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -94,7 +96,24 @@ public class NavigationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mFuseLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
+
+        //using mapbox Google Locatoin engine
+
+        /*
+        locationEngine = GoogleLocationEngine.getLocationEngine(getActivity());
+        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+        locationEngine.activate();
+         */
+
         //setting up AndroidLocation to get current user's location via GPS & Satellite
+        /*
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         //define listener that responds to location updates
         Log.i("NavFragtry","location manager up");
@@ -129,13 +148,7 @@ public class NavigationFragment extends Fragment {
                 Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
             }
         };
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-
+        */
     }
 
     @SuppressLint("MissingPermission")
@@ -168,7 +181,7 @@ public class NavigationFragment extends Fragment {
                         .snippet(String.valueOf(destinationCoord.getLatitude())+","
                                 +String.valueOf(destinationCoord.getLongitude())+","
                                 +String.valueOf(destinationCoord.getAltitude())));
-                //map is ready before current location is determined
+                enableLocationPlugin();
             }
         });
 
@@ -201,54 +214,121 @@ public class NavigationFragment extends Fragment {
         }
     }
 
+    /**
+            * This interface must be implemented by activities that contain this
+            * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+             * >Communicating with Other Fragments</a> for more information.
+            */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
+    @SuppressWarnings( {"MissingPermission"})
+    private void enableLocationPlugin() {
+        // Check if permissions are enabled and if not request
+        if (PermissionsManager.areLocationPermissionsGranted(getActivity())) {
+            // Create an instance of LOST location engine
+            initializeLocationEngine();
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+            locationPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
+            locationPlugin.setLocationLayerEnabled(LocationLayerMode.TRACKING);
+        } else {
+            permissionsManager = new PermissionsManager(this);
+            permissionsManager.requestLocationPermissions(getActivity());
+        }
     }
 
-    //mapbox methods
+    @SuppressWarnings( {"MissingPermission"})
+    private void initializeLocationEngine() {
+        locationEngine = new LostLocationEngine(getActivity());
+        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
+        locationEngine.activate();
+
+        Location lastLocation = locationEngine.getLastLocation();
 
 
+        if (lastLocation != null) {
+            originLocation = lastLocation;
+            setCameraPosition(lastLocation);
+        } else {
+            locationEngine.addLocationEngineListener(this);
+        }
+    }
 
     private void setCameraPosition(Location location) {
-        LatLng currentCoord  = new LatLng(location.getLatitude(), location.getLongitude());
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom( currentCoord, 18));
-        map.addMarker(new MarkerOptions()
-                .position(currentCoord)
-                .title("Current")
-                .snippet(String.valueOf(currentCoord.getLatitude())+","
-                        +String.valueOf(currentCoord.getLongitude())+","
-                        +String.valueOf(currentCoord.getAltitude())));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(location.getLatitude(), location.getLongitude()), 13));
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocationPlugin();
+        } else {
+            getActivity().finish();
+        }
+    }
+
+    @Override
+    @SuppressWarnings( {"MissingPermission"})
+    public void onConnected() {
+        Toast.makeText(getActivity(), "connected", Toast.LENGTH_SHORT).show();
+        locationEngine.requestLocationUpdates();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            originLocation = location;
+            setCameraPosition(location);
+            locationEngine.removeLocationEngineListener(this);
+        }
+    }
 
     @Override
     @SuppressWarnings( {"MissingPermission"})
     public void onStart() {
         super.onStart();
+        if (locationEngine != null) {
+            locationEngine.requestLocationUpdates();
+        }
+        if (locationPlugin != null) {
+            locationPlugin.onStart();
+        }
         mapView.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        if (locationEngine != null) {
+            locationEngine.removeLocationUpdates();
+        }
+        if (locationPlugin != null) {
+            locationPlugin.onStop();
+        }
         mapView.onStop();
     }
 
@@ -256,6 +336,9 @@ public class NavigationFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        if (locationEngine != null) {
+            locationEngine.deactivate();
+        }
     }
 
     @Override
@@ -264,22 +347,16 @@ public class NavigationFragment extends Fragment {
         mapView.onLowMemory();
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
-        //this will continously request for location updates
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
-
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mapView.onPause();
-        locationManager.removeUpdates(locationListener);
     }
 
     @Override
