@@ -3,8 +3,6 @@ package com.example.jingyun.hdarchallenge.Fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +22,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -64,9 +63,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private MapboxMap map;
     private LatLng destinationCoord;
     private Button loadBttn;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    private Location originLocation;
+    private Location currentLocation; //will be determine by locationEngine
 
     private FusedLocationProviderClient mFuseLocationClient;
 
@@ -97,7 +94,12 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFuseLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        //here we will set up non-graphical stuff in the app (stuff that wont be appear
+
+        //setting up destination information
+        destinationCoord = new LatLng(1.3314,103.9477); //latitude longitude is provided by master app
+
+
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -130,7 +132,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                 //setting up initial style of the map
                 map = mapboxMap;
                 mapboxMap.setStyleUrl(Style.SATELLITE);
-                destinationCoord = new LatLng(40.73581,-73.99155);
                 mapboxMap.addMarker(new MarkerOptions()
                         .position(destinationCoord)
                         .title("Destination")
@@ -138,7 +139,8 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                                 +String.valueOf(destinationCoord.getLongitude())+","
                                 +String.valueOf(destinationCoord.getAltitude())));
                 enableLocationPlugin();
-                
+
+
             }
         });
 
@@ -200,7 +202,9 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
             initializeLocationEngine();
 
             locationPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
+            //TODO: ensure marker displays user information
             locationPlugin.setLocationLayerEnabled(LocationLayerMode.TRACKING);
+
         } else {
             permissionsManager = new PermissionsManager(this);
             permissionsManager.requestLocationPermissions(getActivity());
@@ -218,18 +222,21 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
 
         if (lastLocation != null) {
 
-            originLocation = lastLocation;
+            currentLocation = lastLocation;
             setCameraPosition(lastLocation);
         } else {
             Log.i("NavigationFrag","location Engine null");
-            Log.i("NavigationFrag","locationEngine conneted"+String.valueOf(locationEngine.isConnected()));
+            Log.i("NavigationFrag","locationEngine connected"+String.valueOf(locationEngine.isConnected()));
             locationEngine.addLocationEngineListener(this);
         }
     }
 
     private void setCameraPosition(Location location) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 13));
+        LatLngBounds zoomBound = new LatLngBounds.Builder()
+                .include(destinationCoord)
+                .include(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()))
+                .build();
+        map.easeCamera(CameraUpdateFactory.newLatLngBounds(zoomBound,100));
     }
 
     @Override
@@ -261,7 +268,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            originLocation = location;
+            currentLocation = location;
             setCameraPosition(location);
             locationEngine.removeLocationEngineListener(this);
         }
