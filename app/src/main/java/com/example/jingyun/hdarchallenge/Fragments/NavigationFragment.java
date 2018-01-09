@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,51 +105,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         }
 
 
-        //using mapbox Google Locatoin engine
-
-        /*
-        locationEngine = GoogleLocationEngine.getLocationEngine(getActivity());
-        locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
-        locationEngine.activate();
-         */
-
-        //setting up AndroidLocation to get current user's location via GPS & Satellite
-        /*
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        //define listener that responds to location updates
-        Log.i("NavFragtry","location manager up");
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                //called when new location is found by the network location provider
-                Toast.makeText(getActivity(), "onLocationChanged", Toast.LENGTH_SHORT).show();
-                currentloc = location;
-                Toast.makeText(getActivity(), "curreloc_null "+String.valueOf(currentloc==null), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(), currentloc.toString(), Toast.LENGTH_SHORT).show();
-                locationManager.removeUpdates(this);
-
-                //once location is obtained, animate the map
-                setCameraPosition(currentloc);
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-                Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(), String.valueOf(i), Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-                Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
-            }
-        };
-        */
     }
 
     @SuppressLint("MissingPermission")
@@ -182,6 +138,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                                 +String.valueOf(destinationCoord.getLongitude())+","
                                 +String.valueOf(destinationCoord.getAltitude())));
                 enableLocationPlugin();
+                
             }
         });
 
@@ -260,9 +217,12 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
 
 
         if (lastLocation != null) {
+
             originLocation = lastLocation;
             setCameraPosition(lastLocation);
         } else {
+            Log.i("NavigationFrag","location Engine null");
+            Log.i("NavigationFrag","locationEngine conneted"+String.valueOf(locationEngine.isConnected()));
             locationEngine.addLocationEngineListener(this);
         }
     }
@@ -294,7 +254,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     @Override
     @SuppressWarnings( {"MissingPermission"})
     public void onConnected() {
-        Toast.makeText(getActivity(), "connected", Toast.LENGTH_SHORT).show();
+        Log.i("NavigationFrag","connected");
         locationEngine.requestLocationUpdates();
     }
 
