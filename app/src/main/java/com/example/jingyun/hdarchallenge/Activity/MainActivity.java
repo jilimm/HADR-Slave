@@ -133,6 +133,8 @@ public class MainActivity extends AppCompatActivity
 
         if (fragment!=null){
             transaction.replace(R.id.fragment_container, fragment);
+            //allows you to get back to the main page when yuo press back
+            getSupportFragmentManager().popBackStack();
             transaction.commit();
         }
 

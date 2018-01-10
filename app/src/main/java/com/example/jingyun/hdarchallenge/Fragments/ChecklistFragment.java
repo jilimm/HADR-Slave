@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +94,7 @@ public class ChecklistFragment extends Fragment {
         getActivity().setTitle("Checklist");
         checkboxListView = (ListView) rootView.findViewById(R.id.checklistListView);
         checklistDoneBttn = (Button) rootView.findViewById(R.id.checklist_done_bttn);
+
         //setting up my list view
         checklistAdapter = new ChecklistAdapter(getActivity(),checkboxList);
         checkboxListView.setAdapter(checklistAdapter);
@@ -101,7 +104,11 @@ public class ChecklistFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 //TODO: transaction to message fragment
-                Toast.makeText(getActivity(), "done button clicked", Toast.LENGTH_SHORT).show();
+                Fragment fragment = new NavigationFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.commit();
             }
         });
 

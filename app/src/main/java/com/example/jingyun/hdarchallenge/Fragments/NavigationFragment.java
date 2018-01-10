@@ -416,8 +416,8 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                         navigationMapRoute.addRoute(currentRoute);
                         Log.e(TAG, "route added");
                         Log.e(TAG, currentRoute.toString());
-                        Log.e(TAG, String.valueOf(currentRoute.duration()));
-                        etaText.setText("ETA :"+String.valueOf(currentRoute.duration())+"/n"+currentRoute.routeOptions());
+                        etaText.setText("ETA :"+String.valueOf(currentRoute.duration()/60)+"min "+String.valueOf(currentRoute.duration()%60)+"sec"+"\n"+
+                                        "Distance: "+String.valueOf(currentRoute.distance()));
 
 
                     }
