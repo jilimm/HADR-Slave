@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jingyun.hdarchallenge.Fragments.ChecklistFragment;
+import com.example.jingyun.hdarchallenge.Fragments.MessageFragment;
 import com.example.jingyun.hdarchallenge.Fragments.NavigationFragment;
 import com.example.jingyun.hdarchallenge.R;
 
@@ -27,7 +28,8 @@ import org.w3c.dom.Text;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ChecklistFragment.OnFragmentInteractionListener,
-        NavigationFragment.OnFragmentInteractionListener
+        NavigationFragment.OnFragmentInteractionListener,
+        MessageFragment.OnFragmentInteractionListener
 {
 
     private TextView userTeamName;
@@ -48,15 +50,17 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.main_msg_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton msgFab = (FloatingActionButton) findViewById(R.id.main_msg_fab);
+        msgFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "message button pressed", Toast.LENGTH_SHORT).show();
-                /*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                        */
+                Fragment msgFragment = new MessageFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, msgFragment);
+                getSupportFragmentManager().popBackStack();
+                transaction.commit();
+
+
             }
         });
 
@@ -121,7 +125,6 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_report) {
             Toast.makeText(this, "report clicked", Toast.LENGTH_SHORT).show();
-
         } else if (id == R.id.nav_notify) {
             Toast.makeText(this, "notify clicked", Toast.LENGTH_SHORT).show();
 

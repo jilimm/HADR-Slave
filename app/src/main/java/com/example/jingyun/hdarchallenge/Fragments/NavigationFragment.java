@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -416,8 +416,10 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                         navigationMapRoute.addRoute(currentRoute);
                         Log.e(TAG, "route added");
                         Log.e(TAG, currentRoute.toString());
-                        etaText.setText("ETA :"+String.valueOf(currentRoute.duration()/60)+"min "+String.valueOf(currentRoute.duration()%60)+"sec"+"\n"+
-                                        "Distance: "+String.valueOf(currentRoute.distance()));
+                        Double min = currentRoute.duration()/60;
+                        Double sec = currentRoute.duration()%60;
+                        etaText.setText("ETA :"+String.valueOf(Integer.valueOf(min.intValue()))+"min "+String.valueOf(sec.intValue())+"sec"+"\n"+
+                                        "Distance: "+String.valueOf(currentRoute.distance()/1000)+"km");
 
 
                     }
