@@ -267,7 +267,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         Location lastLocation = locationEngine.getLastLocation();
         if (lastLocation != null) {
             currentLocation = lastLocation;
-            Toast.makeText(getActivity(), "DETECTED"+currentLocation.toString(), Toast.LENGTH_SHORT).show();
+            Log.i("NavigationFrag", "DETECTED"+currentLocation.toString());
         } else {
             locationEngine.addLocationEngineListener(this);
         }
@@ -310,14 +310,14 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            Toast.makeText(getActivity(), "locationChanged", Toast.LENGTH_SHORT).show();
+            //Log.i("NavigationFrag","locationChanged");
             currentLocation = location;
             setCameraPosition(location);
             destinationPosition = Position.fromCoordinates(destinationCoord.getLatitude(),destinationCoord.getLongitude());
             originPosition = Position.fromCoordinates(currentLocation.getLatitude(),currentLocation.getLongitude());
             getRoute(originPosition,destinationPosition);
             locationEngine.removeLocationEngineListener(this);
-            Toast.makeText(getActivity(), "route obtained", Toast.LENGTH_SHORT).show();
+            Log.i("NavigationFrag","route obtained");
         }
     }
 
