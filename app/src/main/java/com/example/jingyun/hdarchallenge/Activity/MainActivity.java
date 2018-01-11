@@ -45,10 +45,7 @@ public class MainActivity extends AppCompatActivity
         final String userID = intent.getStringExtra("userTeam");
         Log.i("MainActivity","username received is "+userID);
 
-        //some problems null objet reference idk why
-        userTeamName = (TextView) findViewById(R.id.userIDName);
-        userTeamName.setText(userID);
-        //userTeamName.setText(userID);
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -75,6 +72,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        userTeamName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.userIDName);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
