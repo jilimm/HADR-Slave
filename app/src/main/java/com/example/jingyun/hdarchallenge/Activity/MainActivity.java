@@ -24,6 +24,7 @@ import com.example.jingyun.hdarchallenge.Fragments.MessageFragment;
 import com.example.jingyun.hdarchallenge.Fragments.NavigationFragment;
 import com.example.jingyun.hdarchallenge.Fragments.ReportFragment;
 import com.example.jingyun.hdarchallenge.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.w3c.dom.Text;
 
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_signout) {
             //brings you to the login page
+            FirebaseAuth.getInstance().signOut();
             Intent signoutIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(signoutIntent);
         }
