@@ -159,19 +159,16 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         etaText = (TextView) rootView.findViewById(R.id.map_notes) ;
         weatherIc = (ImageView) rootView.findViewById(R.id.map_weather_logo);
 
-        //setting up weather information
-        //TODO: insert weather information
-        /*
+
         if (weatherType==Weather.CLOUDY){
-            weatherIc.setImageDrawable();
+            weatherIc.setBackgroundResource(R.mipmap.weather_cloudy);
         }else if(weatherType==Weather.RAIN){
-                weatherIc.setImageDrawable();
+                weatherIc.setBackgroundResource(R.mipmap.weather_storm_rainy);
         } else if(weatherType==Weather.SNOW){
-            weatherIc.setImageDrawable();
+            weatherIc.setBackgroundResource(R.mipmap.weather_storm_snowy);
         } else if(weatherType==Weather.SUNNY){
-            weatherIc.setImageDrawable();
+            weatherIc.setBackgroundResource(R.mipmap.weather_sunny);
         }
-        */
 
 
 
