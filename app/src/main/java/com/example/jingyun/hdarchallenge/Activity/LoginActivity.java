@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.jingyun.hdarchallenge.Adapter.SelectUserAdapter;
 import com.example.jingyun.hdarchallenge.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private List<String> teamList;
     private SelectUserAdapter userAdapter;
     private String userID;
+    private FirebaseAuth mAuth;
 
 
     @Override
@@ -36,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
         loginBttn = (Button) findViewById(R.id.loginBttn);
         enterPassword = (EditText) findViewById(R.id.enterPassword);
         enterUserID = (Spinner) findViewById(R.id.enterUserID);
+        mAuth = FirebaseAuth.getInstance();
+
 
         teamList = new ArrayList<String>();
         teamList.add("Select Team");//initial dummy entry that appears as prompt TODO: back end for prompt

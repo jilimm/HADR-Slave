@@ -29,8 +29,7 @@
     <ImageView
         android:id="@+id/map_weather_logo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/mapbox_info_bg_selector" />
+        android:layout_height="wrap_content" />
 
 
 

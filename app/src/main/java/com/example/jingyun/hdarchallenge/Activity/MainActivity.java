@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity
 {
 
     private TextView userTeamName;
+    private FloatingActionButton msgFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +51,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton msgFab = (FloatingActionButton) findViewById(R.id.main_msg_fab);
+        msgFab = (FloatingActionButton) findViewById(R.id.main_msg_fab);
         msgFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Fragment msgFragment = new MessageFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, msgFragment);
+                msgFab.hide();
                 getSupportFragmentManager().popBackStack();
                 transaction.commit();
 
@@ -118,16 +120,20 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_checklist) {
             fragment = new ChecklistFragment();
+            msgFab.show();
 
         } else if (id == R.id.nav_navigation) {
             Toast.makeText(this, "navigation pressed", Toast.LENGTH_SHORT).show();
             fragment = new NavigationFragment();
+            msgFab.show();
 
         } else if (id == R.id.nav_report) {
             fragment = new ReportFragment();
+            msgFab.show();
 
         } else if (id == R.id.nav_notify) {
             fragment = new MessageFragment();
+            msgFab.hide();
             Toast.makeText(this, "notify clicked", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_signout) {
@@ -152,4 +158,5 @@ public class MainActivity extends AppCompatActivity
     public void onFragmentInteraction(Uri uri) {
 
     }
+
 }

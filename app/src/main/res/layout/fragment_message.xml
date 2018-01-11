@@ -6,43 +6,49 @@
     tools:context="com.example.jingyun.hdarchallenge.Fragments.MessageFragment">
 
     <!-- TODO: Update blank fragment layout -->
-
-
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/msg_enter_text"
         android:layout_width="281dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Type your message here"
-        tools:layout_editor_absoluteX="54dp"
-        tools:layout_editor_absoluteY="449dp" />
+        android:hint="Type your message here"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/msg_send_bttn"
+        app:layout_constraintStart_toEndOf="@+id/msg_camera" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/msg_send_bttn"
         android:layout_width="33dp"
         android:layout_height="38dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/ic_menu_send"
-        tools:layout_editor_absoluteX="335dp"
-        tools:layout_editor_absoluteY="457dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/msg_camera"
         android:layout_width="38dp"
         android:layout_height="37dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
         android:background="@drawable/ic_menu_camera"
-        tools:layout_editor_absoluteX="7dp"
-        tools:layout_editor_absoluteY="458dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/msg_camera_img"
         android:layout_width="509dp"
         android:layout_height="452dp"
         android:layout_marginStart="16dp"
         android:src="@mipmap/dumb_message"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/msg_enter_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/editText"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

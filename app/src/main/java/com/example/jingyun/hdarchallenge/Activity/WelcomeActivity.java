@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.example.jingyun.hdarchallenge.R;
 
 public class WelcomeActivity extends AppCompatActivity {
-    private static int SPLASH_TIMEOUT = 2000; //the splash welcome screen would only be on for 3 secons (3000miliseconds)
+    private static int SPLASH_TIMEOUT = 1000; //the splash welcome screen would only be on for 3 secons (3000miliseconds)
 
 
     private TextView userName;

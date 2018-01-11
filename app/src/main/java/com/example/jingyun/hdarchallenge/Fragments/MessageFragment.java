@@ -1,16 +1,26 @@
 package com.example.jingyun.hdarchallenge.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.jingyun.hdarchallenge.Activity.MainActivity;
 import com.example.jingyun.hdarchallenge.R;
+
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -31,7 +41,12 @@ public class MessageFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private Button submitBttn;
+    private Button sendBttn;
+    private EditText msgEditText;
+    private ImageView cameraPic;
+    private Button cameraBttn;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -73,9 +88,31 @@ public class MessageFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_message, container, false);
         getActivity().setTitle("Notify");
 
+
         //setting up the view
-        submitBttn = (Button) rootView.findViewById(R.id.msg_submit_bttn);
-        Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
+        sendBttn = (Button) rootView.findViewById(R.id.msg_send_bttn);
+        cameraBttn = (Button) rootView.findViewById(R.id.msg_camera);
+        msgEditText = (EditText) rootView.findViewById(R.id.msg_enter_text);
+        cameraPic = (ImageView) rootView.findViewById(R.id.msg_camera_img);
+
+
+        sendBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        cameraBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                PackageManager packageManager = getActivity().getPackageManager();
+                if (takePictureIntent.resolveActivityInfo(packageManager,0)!=null){
+                    startActivityForResult(takePictureIntent,REQUEST_IMAGE_CAPTURE);
+                }
+            }
+        });
         return rootView;
     }
 
@@ -116,5 +153,13 @@ public class MessageFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            cameraPic.setImageBitmap(imageBitmap);
+        }
     }
 }
