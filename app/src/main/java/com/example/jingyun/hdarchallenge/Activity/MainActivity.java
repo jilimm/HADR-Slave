@@ -114,11 +114,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Fragment fragment = null;
+        Fragment fragment = new ChecklistFragment();
 
         if (id == R.id.nav_checklist) {
             fragment = new ChecklistFragment();
-
 
         } else if (id == R.id.nav_navigation) {
             Toast.makeText(this, "navigation pressed", Toast.LENGTH_SHORT).show();

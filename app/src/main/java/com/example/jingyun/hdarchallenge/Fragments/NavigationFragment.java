@@ -6,7 +6,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,10 +18,10 @@ import android.widget.Toast;
 import com.example.jingyun.hdarchallenge.R;
 
 //imports used for getting navigation route
-import com.mapbox.geojson.BoundingBox;
 import com.mapbox.geojson.Point;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
+import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation;
 import com.mapbox.services.api.directions.v5.DirectionsCriteria;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
@@ -52,7 +51,6 @@ import com.mapbox.services.android.telemetry.location.LostLocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -64,6 +62,10 @@ import java.util.List;
  * Use the {@link NavigationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+//TODO: have alert dialog if GPS not on, if can customize the layers
+
+
 public class NavigationFragment extends Fragment implements LocationEngineListener, PermissionsListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,7 +81,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private MapView mapView;
     private MapboxMap map;
     private LatLng destinationCoord;
-    private Button loadBttn;
+    private Button navigationBttn;
     private TextView etaText;
     //things needed to get and update user current location
     private PermissionsManager permissionsManager;
@@ -91,9 +93,9 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private Position originPosition;
     private Position destinationPosition;
     private DirectionsRoute currentRoute;
+    private String
     private static final String TAG = "DirectionsActivity";
     private NavigationMapRoute navigationMapRoute;
-
 
 
     public NavigationFragment() {
@@ -128,8 +130,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         //setting up destination information
         destinationCoord = new LatLng(1.3314,103.9477); //latitude longitude is provided by master app
 
-
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -149,7 +149,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
 
         //setting up things in xml file
         mapView = (MapView) rootView.findViewById(R.id.map_mapView);
-        loadBttn = (Button) rootView.findViewById(R.id.map_load_bttn);
+        navigationBttn = (Button) rootView.findViewById(R.id.map_start_nav_bttn);
         etaText = (TextView) rootView.findViewById(R.id.map_notes) ;
 
         //setting up the map
@@ -173,28 +173,25 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         });
 
         //setting up the button
-        loadBttn.setOnClickListener(new View.OnClickListener() {
+        navigationBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(), "TEMP: navigation button", Toast.LENGTH_LONG).show();
-
                 //to launch navigation mode
 
-                /*
-                if (currentLocation!=null){
-                    String awsPoolId = null;
 
-                    boolean simulateRoute = true;
-
+                if (currentRoute!=null){
+                    //navigation = new MapboxNavigation(getActivity(),getString(R.string.mapbox_access_token));
+                    NavigationViewOptions options = NavigationViewOptions.builder()
+                            .directionsRoute(currentRoute)
+                            .awsPoolId(null)
+                            .shouldSimulateRoute(false) //the app wont tell you how to walk there
+                            .build();
+                    NavigationLauncher.startNavigation(getActivity(),options);
                     // Call this method with Context from within an Activity
-                    NavigationLauncher.startNavigation(getActivity(), originPosition,destinationPosition, awsPoolId,simulateRoute);
                 }else{
-                    Toast.makeText(getActivity(), "Current Location cannot be obtained", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please wait for current location to de betected", Toast.LENGTH_SHORT).show();
                     Log.i("Navigation Frag","current location null2");
-
                 }
-                */
-
             }
         });
 
