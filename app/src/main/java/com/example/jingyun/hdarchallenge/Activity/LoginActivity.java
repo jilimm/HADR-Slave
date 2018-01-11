@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         enterUserID = (Spinner) findViewById(R.id.enterUserID);
 
         teamList = new ArrayList<String>();
-        teamList.add("Select Team");//initial dummy entry that will appear as the hint
+        teamList.add("Select Team");//initial dummy entry that appears as prompt TODO: back end for prompt
         teamList.add("Team 1");
         teamList.add("Team 2");
         teamList.add("Team 3");
