@@ -144,7 +144,7 @@ public class MessageFragment extends Fragment {
                 });
                 Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
                 fileName++;
-                cameraPic.setImageDrawable(R.drawable.ic_menu_report_image);
+                cameraPic.setImageResource(R.drawable.ic_menu_camera);
             }
         });
 
