@@ -12,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jingyun.hdarchallenge.Items.Weather;
 import com.example.jingyun.hdarchallenge.R;
 
 //imports used for getting navigation route
@@ -75,14 +77,17 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private OnFragmentInteractionListener mListener;
-    //things needed to create the view in the fragment
+
+    //Creating view of fragment
     private MapView mapView;
     private MapboxMap map;
     private LatLng destinationCoord;
     private Button navigationBttn;
     private TextView etaText;
+    private ImageView weatherIc;
+    private Weather weatherType;
+
     //things needed to get and update user current location
     private PermissionsManager permissionsManager;
     private LocationLayerPlugin locationPlugin;
@@ -93,10 +98,8 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private Position originPosition;
     private Position destinationPosition;
     private DirectionsRoute currentRoute;
-    private String
     private static final String TAG = "DirectionsActivity";
     private NavigationMapRoute navigationMapRoute;
-
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -125,10 +128,13 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //here we will set up non-graphical stuff in the app (stuff that wont be appear
+        //TODO: check if the user has switched on GPS
 
         //setting up destination information
         destinationCoord = new LatLng(1.3314,103.9477); //latitude longitude is provided by master app
+
+        //TODO: obtain from firebase
+        weatherType = Weather.RAIN;
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -151,6 +157,23 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
         mapView = (MapView) rootView.findViewById(R.id.map_mapView);
         navigationBttn = (Button) rootView.findViewById(R.id.map_start_nav_bttn);
         etaText = (TextView) rootView.findViewById(R.id.map_notes) ;
+        weatherIc = (ImageView) rootView.findViewById(R.id.map_weather_logo);
+
+        //setting up weather information
+        //TODO: insert weather information
+        /*
+        if (weatherType==Weather.CLOUDY){
+            weatherIc.setImageDrawable();
+        }else if(weatherType==Weather.RAIN){
+                weatherIc.setImageDrawable();
+        } else if(weatherType==Weather.SNOW){
+            weatherIc.setImageDrawable();
+        } else if(weatherType==Weather.SUNNY){
+            weatherIc.setImageDrawable();
+        }
+        */
+
+
 
         //setting up the map
         Mapbox.getInstance(getActivity(), getString(R.string.mapbox_access_token));
@@ -177,8 +200,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
             @Override
             public void onClick(View view) {
                 //to launch navigation mode
-
-
                 if (currentRoute!=null){
                     //navigation = new MapboxNavigation(getActivity(),getString(R.string.mapbox_access_token));
                     NavigationViewOptions options = NavigationViewOptions.builder()
@@ -189,7 +210,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                     NavigationLauncher.startNavigation(getActivity(),options);
                     // Call this method with Context from within an Activity
                 }else{
-                    Toast.makeText(getActivity(), "Please wait for current location to de betected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please wait for current location to de detected", Toast.LENGTH_SHORT).show();
                     Log.i("Navigation Frag","current location null2");
                 }
             }
@@ -415,7 +436,8 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                         Double min = currentRoute.duration()/60;
                         Double sec = currentRoute.duration()%60;
                         etaText.setText("ETA :"+String.valueOf(Integer.valueOf(min.intValue()))+"min "+String.valueOf(sec.intValue())+"sec"+"\n"+
-                                        "Distance: "+String.valueOf(currentRoute.distance()/1000)+"km");
+                                        "Distance: "+String.valueOf(currentRoute.distance()/1000)+"km"+"\n"+
+                                        "Weather Expected: ");
 
 
                     }
