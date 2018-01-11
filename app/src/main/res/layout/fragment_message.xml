@@ -34,4 +34,15 @@
         tools:layout_editor_absoluteX="7dp"
         tools:layout_editor_absoluteY="458dp" />
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="509dp"
+        android:layout_height="452dp"
+        android:layout_marginStart="16dp"
+        android:src="@mipmap/dumb_message"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/editText"/>
+
 </android.support.constraint.ConstraintLayout>
