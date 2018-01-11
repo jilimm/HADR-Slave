@@ -17,7 +17,7 @@
         android:layout_width="102dp"
         android:layout_height="81dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@drawable/teams_logo" />
+        app:srcCompat="@mipmap/teams_logo" />
 
     <TextView
         android:id="@+id/userIDName"
