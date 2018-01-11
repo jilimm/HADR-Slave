@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,11 +15,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.jingyun.hdarchallenge.Activity.MainActivity;
 import com.example.jingyun.hdarchallenge.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -46,6 +58,8 @@ public class MessageFragment extends Fragment {
     private ImageView cameraPic;
     private Button cameraBttn;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private FirebaseStorage storage;
+    private int fileName=0;
 
 
     private OnFragmentInteractionListener mListener;
@@ -75,6 +89,9 @@ public class MessageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        storage = FirebaseStorage.getInstance();
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -95,11 +112,39 @@ public class MessageFragment extends Fragment {
         msgEditText = (EditText) rootView.findViewById(R.id.msg_enter_text);
         cameraPic = (ImageView) rootView.findViewById(R.id.msg_camera_img);
 
+        final StorageReference storageReference = storage.getReference();
+
+
+
+
 
         sendBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                StorageReference picRef = storageReference.child("picture"+"_userName_"+String.valueOf(fileName));
+                cameraPic.setDrawingCacheEnabled(true);
+                cameraPic.buildDrawingCache();
+                Bitmap bitmap = cameraPic.getDrawingCache();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
+
+                UploadTask uploadTask = picRef.putBytes(data);
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    }
+                });
                 Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
+                fileName++;
+                cameraPic.setImageDrawable(R.drawable.ic_menu_report_image);
             }
         });
 

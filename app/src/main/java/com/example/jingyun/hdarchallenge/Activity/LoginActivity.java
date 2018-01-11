@@ -48,11 +48,23 @@ public class LoginActivity extends AppCompatActivity {
         enterUserID = (EditText) findViewById(R.id.enterUserID);
         firebaseAuth = FirebaseAuth.getInstance();
 
-        enterPassword.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+        enterPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     loginBttn.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        enterUserID.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                    //go to passsword TODO: not working
+                    enterPassword.performClick();
                     return true;
                 }
                 return false;
