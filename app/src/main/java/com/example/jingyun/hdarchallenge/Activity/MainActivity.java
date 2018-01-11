@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.example.jingyun.hdarchallenge.Fragments.ChecklistFragment;
 import com.example.jingyun.hdarchallenge.Fragments.MessageFragment;
 import com.example.jingyun.hdarchallenge.Fragments.NavigationFragment;
+import com.example.jingyun.hdarchallenge.Fragments.ReportFragment;
 import com.example.jingyun.hdarchallenge.R;
 
 import org.w3c.dom.Text;
@@ -40,11 +42,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
-        final String userID = intent.getStringExtra("userID");
-        Toast.makeText(this, "userName received is "+userID, Toast.LENGTH_SHORT).show();
+        final String userID = intent.getStringExtra("userTeam");
+        Log.i("MainActivity","username received is "+userID);
 
         //some problems null objet reference idk why
         userTeamName = (TextView) findViewById(R.id.userIDName);
+        userTeamName.setText(userID);
         //userTeamName.setText(userID);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -124,8 +127,10 @@ public class MainActivity extends AppCompatActivity
             fragment = new NavigationFragment();
 
         } else if (id == R.id.nav_report) {
-            Toast.makeText(this, "report clicked", Toast.LENGTH_SHORT).show();
+            fragment = new ReportFragment();
+
         } else if (id == R.id.nav_notify) {
+            fragment = new MessageFragment();
             Toast.makeText(this, "notify clicked", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.nav_signout) {

@@ -178,7 +178,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
             public void onClick(View view) {
                 Toast.makeText(getActivity(), "TEMP: navigation button", Toast.LENGTH_LONG).show();
 
-
                 //to launch navigation mode
 
                 /*
