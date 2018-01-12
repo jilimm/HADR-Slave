@@ -22,11 +22,8 @@ import android.widget.Toast;
 import com.example.jingyun.hdarchallenge.Fragments.ChecklistFragment;
 import com.example.jingyun.hdarchallenge.Fragments.MessageFragment;
 import com.example.jingyun.hdarchallenge.Fragments.NavigationFragment;
-import com.example.jingyun.hdarchallenge.Fragments.ReportFragment;
 import com.example.jingyun.hdarchallenge.R;
 import com.google.firebase.auth.FirebaseAuth;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -128,10 +125,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_navigation) {
             Toast.makeText(this, "navigation pressed", Toast.LENGTH_SHORT).show();
             fragment = new NavigationFragment();
-            msgFab.show();
-
-        } else if (id == R.id.nav_report) {
-            fragment = new ReportFragment();
             msgFab.show();
 
         } else if (id == R.id.nav_notify) {

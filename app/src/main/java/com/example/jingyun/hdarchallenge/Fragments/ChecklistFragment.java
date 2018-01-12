@@ -49,8 +49,7 @@ public class ChecklistFragment extends Fragment {
             new ChecklistItem("Item 6","testType"),
             new ChecklistItem("Item 7","testType"),
             new ChecklistItem("Item 8","testType"),
-            new ChecklistItem("Item 9","testType"),
-            new ChecklistItem("Item 10","testType"));
+            new ChecklistItem("Item 9","testType"));
 
     private ListView checkboxListView;
     public static ChecklistAdapter checklistAdapter;
@@ -109,7 +108,9 @@ public class ChecklistFragment extends Fragment {
                 for (ChecklistItem checklistItem: checkboxList){
                     if (!checklistItem.isSelected()){
                         allSelected=false;
+                        Toast.makeText(getActivity(), checklistItem.getItemName(), Toast.LENGTH_SHORT).show();
                     }
+                    else{allSelected=true;}
                 }
 
                 if (allSelected){
@@ -141,6 +142,7 @@ public class ChecklistFragment extends Fragment {
                                 }
                             });
                     AlertDialog dialog = builder.create();
+                    dialog.show();
 
                 }
 
