@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     private TextView userTeamName;
     private FloatingActionButton msgFab;
+    String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         final String userID = intent.getStringExtra("userTeam");
         Log.i("MainActivity","username received is "+userID);
+        userName = userID;
 
         //set the defaul fragment to hte checklist
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new ChecklistFragment()).commit();
@@ -154,6 +156,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    public String getUserName(){
+        return this.userName;
     }
 
 }

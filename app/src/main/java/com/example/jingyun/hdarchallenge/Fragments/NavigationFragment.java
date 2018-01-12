@@ -16,10 +16,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jingyun.hdarchallenge.Activity.MainActivity;
 import com.example.jingyun.hdarchallenge.Items.Weather;
 import com.example.jingyun.hdarchallenge.R;
 
 //imports used for getting navigation route
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.mapbox.geojson.Point;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
 import com.mapbox.services.android.navigation.ui.v5.NavigationViewOptions;
@@ -54,7 +60,9 @@ import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -87,6 +95,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private TextView etaText;
     private ImageView weatherIc;
     private Weather weatherType;
+    private String userName;
 
     //things needed to get and update user current location
     private PermissionsManager permissionsManager;
@@ -132,6 +141,27 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
 
         //setting up destination information
         destinationCoord = new LatLng(1.3314,103.9477); //latitude longitude is provided by master app
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> user = new HashMap<>();
+        user.put("Team", "testUser");
+        user.put("latitude",currentLocation.getLatitude());
+        user.put("longitude",currentLocation.getLongitude());
+        user.put("altitue",currentLocation.getAltitude());
+        db.collection("Users").document("Location")
+                .set(user, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Firebase", "DocumentSnapshot added successfully");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("Firebase", "Error adding document");
+                    }
+                });
+
 
         //TODO: obtain from firebase
         weatherType = Weather.RAIN;
