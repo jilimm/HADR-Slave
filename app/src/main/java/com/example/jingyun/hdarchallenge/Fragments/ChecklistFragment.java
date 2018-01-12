@@ -41,15 +41,15 @@ public class ChecklistFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private List<ChecklistItem> checkboxList = Arrays.asList(new ChecklistItem("Item 1","testType"),
-            new ChecklistItem("Item 2","testType"),
-            new ChecklistItem("Item 3","testType"),
-            new ChecklistItem("Item 4","testType"),
-            new ChecklistItem("Item 5","testType"),
-            new ChecklistItem("Item 6","testType"),
-            new ChecklistItem("Item 7","testType"),
-            new ChecklistItem("Item 8","testType"),
-            new ChecklistItem("Item 9","testType"));
+    private List<ChecklistItem> checkboxList = Arrays.asList(new ChecklistItem("First Aid Kit","testType"),
+            new ChecklistItem("Water Supplies","testType"),
+            new ChecklistItem("Food Supplies","testType"),
+            new ChecklistItem("Generator","testType"),
+            new ChecklistItem("Medicine","testType"),
+            new ChecklistItem("Spare Clothing","testType"),
+            new ChecklistItem("Blankets","testType"),
+            new ChecklistItem("Masks","testType"),
+            new ChecklistItem("Spare toys for kids","testType"));
 
     private ListView checkboxListView;
     public static ChecklistAdapter checklistAdapter;
