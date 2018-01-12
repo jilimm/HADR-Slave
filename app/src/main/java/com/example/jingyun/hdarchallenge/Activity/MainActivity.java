@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity
         final String userID = intent.getStringExtra("userTeam");
         Log.i("MainActivity","username received is "+userID);
 
+        //set the defaul fragment to hte checklist
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new ChecklistFragment()).commit();
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

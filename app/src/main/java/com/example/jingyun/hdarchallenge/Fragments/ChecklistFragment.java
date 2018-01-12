@@ -1,6 +1,8 @@
 package com.example.jingyun.hdarchallenge.Fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -103,12 +105,45 @@ public class ChecklistFragment extends Fragment {
         checklistDoneBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: transaction to message fragment
-                Fragment fragment = new NavigationFragment();
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, fragment);
-                fragmentTransaction.commit();
+                Boolean allSelected = true;
+                for (ChecklistItem checklistItem: checkboxList){
+                    if (!checklistItem.isSelected()){
+                        allSelected=false;
+                    }
+                }
+
+                if (allSelected){
+                    //go to navigation fragment
+                    Fragment fragment = new NavigationFragment();
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container, fragment);
+                    fragmentTransaction.commit();
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Not all items have been selected. Do you still want to proceed?")
+                            .setTitle("Caution")
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //go to navigation fragment
+                                    Fragment fragment = new NavigationFragment();
+                                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                    fragmentTransaction.replace(R.id.fragment_container, fragment);
+                                    fragmentTransaction.commit();
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+
+                }
+
             }
         });
 
