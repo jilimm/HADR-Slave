@@ -21,10 +21,16 @@ import com.example.jingyun.hdarchallenge.Items.Weather;
 import com.example.jingyun.hdarchallenge.R;
 
 //imports used for getting navigation route
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.SetOptions;
 import com.mapbox.geojson.Point;
 import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
@@ -109,6 +115,9 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private DirectionsRoute currentRoute;
     private static final String TAG = "DirectionsActivity";
     private NavigationMapRoute navigationMapRoute;
+    private FirebaseFirestore db;
+    private Map<String, GeoPoint> user;
+    private FirebaseAuth firebaseAuth;
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -137,30 +146,38 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //TODO: check if the user has switched on GPS
-
+        db = FirebaseFirestore.getInstance();
         //setting up destination information
-        destinationCoord = new LatLng(1.3314,103.9477); //latitude longitude is provided by master app
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> user = new HashMap<>();
-        user.put("Team", "testUser");
-        user.put("latitude",currentLocation.getLatitude());
-        user.put("longitude",currentLocation.getLongitude());
-        user.put("altitue",currentLocation.getAltitude());
-        db.collection("Users").document("Location")
-                .set(user, SetOptions.merge())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Firebase", "DocumentSnapshot added successfully");
+        //destinationCoord = new LatLng(1.3314,103.9477); //latitude longitude is provided by master app
+        DocumentReference docRef = db.collection("users").document("test");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        GeoPoint geoPoint = (GeoPoint) task.getResult().getData().get("destinationloc");
+                        destinationCoord = new LatLng(geoPoint.getLatitude(),geoPoint.getLongitude(),0);
+                        enableLocationPlugin();
+                        map.addMarker(new MarkerOptions()
+                                .position(destinationCoord)
+                                .title("Destination")
+                                .snippet(String.valueOf(destinationCoord.getLatitude())+","
+                                        +String.valueOf(destinationCoord.getLongitude())+","
+                                        +String.valueOf(destinationCoord.getAltitude())));
+                    } else {
+                        Log.d(TAG, "No such document");
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("Firebase", "Error adding document");
-                    }
-                });
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+
+
+        db = FirebaseFirestore.getInstance();
+        user = new HashMap<>();
+
 
 
         //TODO: obtain from firebase
@@ -212,13 +229,8 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                 //setting up initial style of the map
                 map = mapboxMap;
                 mapboxMap.setStyleUrl(Style.SATELLITE_STREETS);
-                mapboxMap.addMarker(new MarkerOptions()
-                        .position(destinationCoord)
-                        .title("Destination")
-                        .snippet(String.valueOf(destinationCoord.getLatitude())+","
-                                +String.valueOf(destinationCoord.getLongitude())+","
-                                +String.valueOf(destinationCoord.getAltitude())));
-                enableLocationPlugin(); //get the user's current location and destination, zooms camera to appropriate level
+
+                 //get the user's current location and destination, zooms camera to appropriate level
             }
         });
 
@@ -293,7 +305,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
             initializeLocationEngine();
 
             locationPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
-            //TODO: ensure marker displays user information
             locationPlugin.setLocationLayerEnabled(LocationLayerMode.TRACKING);
 
         } else {
@@ -357,11 +368,27 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
             //Log.i("NavigationFrag","locationChanged");
             currentLocation = location;
             setCameraPosition(location);
-            destinationPosition = Position.fromCoordinates(destinationCoord.getLatitude(),destinationCoord.getLongitude());
-            originPosition = Position.fromCoordinates(currentLocation.getLatitude(),currentLocation.getLongitude());
-            getRoute(originPosition,destinationPosition);
+            destinationPosition = Position.fromCoordinates(destinationCoord.getLatitude(), destinationCoord.getLongitude());
+            originPosition = Position.fromCoordinates(currentLocation.getLatitude(), currentLocation.getLongitude());
+            getRoute(originPosition, destinationPosition);
+            user.put("currentloc", new GeoPoint(currentLocation.getLatitude(), currentLocation.getLongitude()));
+            db.collection("Users").document("test")
+                    .set(user, SetOptions.merge())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Firebase", "DocumentSnapshot added successfully");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            e.printStackTrace();
+                            Log.w("Firebase", "Error adding document");
+                        }
+                    });
             locationEngine.removeLocationEngineListener(this);
-            Log.i("NavigationFrag","route obtained");
+            Log.i("NavigationFrag", "route obtained");
         }
     }
 

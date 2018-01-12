@@ -128,7 +128,7 @@ public class MessageFragment extends Fragment implements GoogleApiClient.Connect
         sendBttn = (Button) rootView.findViewById(R.id.msg_send_bttn);
         cameraBttn = (Button) rootView.findViewById(R.id.msg_camera);
         msgEditText = (EditText) rootView.findViewById(R.id.msg_enter_text);
-        cameraPic = (ImageView) rootView.findViewById(R.id.msg_camera);
+        cameraPic = (ImageView) rootView.findViewById(R.id.msg_picture);
 
         final StorageReference storageReference = storage.getReference();
         // Create file metadata including the content type

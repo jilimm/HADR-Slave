@@ -41,7 +41,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/msg_picture"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:src="@mipmap/no_image_error"
