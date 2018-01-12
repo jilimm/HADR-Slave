@@ -9,30 +9,32 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.jingyun.hdarchallenge.Activity.MainActivity;
 import com.example.jingyun.hdarchallenge.R;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.android.gms.location.LocationListener;
+
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -45,16 +47,17 @@ import static android.app.Activity.RESULT_OK;
  * Use the {@link MessageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MessageFragment extends Fragment {
+
+public class MessageFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "Google API Client";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private Button sendBttn;
     private EditText msgEditText;
     private ImageView cameraPic;
@@ -62,8 +65,9 @@ public class MessageFragment extends Fragment {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private FirebaseStorage storage;
     private int fileName=0;
-    private Location defaultLocation;
-
+    private Location curentLoc;
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
 
     private OnFragmentInteractionListener mListener;
 
@@ -94,6 +98,17 @@ public class MessageFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         storage = FirebaseStorage.getInstance();
+        googleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        googleApiClient.connect();
+        locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(1000)
+                .setFastestInterval(1000);
+
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -196,6 +211,36 @@ public class MessageFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        try {
+            curentLoc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (curentLoc==null){
+                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,locationRequest,this);
+            }
+        } catch (SecurityException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "GoogleApiClient connection has been suspend");
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        location = location;
+    }
+
+
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -218,4 +263,6 @@ public class MessageFragment extends Fragment {
             cameraPic.setImageBitmap(imageBitmap);
         }
     }
+
+
 }

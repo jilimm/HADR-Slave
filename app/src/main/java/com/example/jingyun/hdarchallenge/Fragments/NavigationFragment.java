@@ -161,13 +161,13 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
 
 
         if (weatherType==Weather.CLOUDY){
-            weatherIc.setBackgroundResource(R.mipmap.weather_cloudy);
+            weatherIc.setImageResource(R.mipmap.weather_cloudy);
         }else if(weatherType==Weather.RAIN){
-                weatherIc.setBackgroundResource(R.mipmap.weather_storm_rainy);
+                weatherIc.setImageResource(R.mipmap.weather_storm_rainy);
         } else if(weatherType==Weather.SNOW){
-            weatherIc.setBackgroundResource(R.mipmap.weather_storm_snowy);
+            weatherIc.setImageResource(R.mipmap.weather_storm_snowy);
         } else if(weatherType==Weather.SUNNY){
-            weatherIc.setBackgroundResource(R.mipmap.weather_sunny);
+            weatherIc.setImageResource(R.mipmap.weather_sunny);
         }
 
 
@@ -401,7 +401,6 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
                 .accessToken(Mapbox.getAccessToken())
                 .origin(Point.fromLngLat(origin.getLatitude(),origin.getLongitude(),origin.getAltitude()))
                 .destination(Point.fromLngLat(destination.getLatitude(),destination.getLongitude(),destination.getAltitude()))
-                .profile(DirectionsCriteria.PROFILE_WALKING)
                 .build()
                 .getRoute(new Callback<DirectionsResponse>() {
                     @Override

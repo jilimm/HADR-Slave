@@ -108,7 +108,6 @@ public class ChecklistFragment extends Fragment {
                 for (ChecklistItem checklistItem: checkboxList){
                     if (!checklistItem.isSelected()){
                         allSelected=false;
-                        Toast.makeText(getActivity(), checklistItem.getItemName(), Toast.LENGTH_SHORT).show();
                     }
                     else{allSelected=true;}
                 }
