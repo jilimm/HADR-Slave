@@ -166,7 +166,7 @@ public class MessageFragment extends Fragment implements GoogleApiClient.Connect
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
                         Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
                         fileName++;
-                        cameraPic.setImageResource(R.drawable.ic_menu_camera);
+                        cameraPic.setImageResource(R.mipmap.no_image_error);
                         msgEditText.setText("");
                     }
                 });

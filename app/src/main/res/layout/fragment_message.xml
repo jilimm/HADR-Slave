@@ -47,7 +47,10 @@
         android:src="@mipmap/no_image_error"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp"
-        app:layout_constraintBottom_toTopOf="@id/msg_enter_text"/>
+        app:layout_constraintBottom_toTopOf="@id/msg_enter_text"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constinatEnd_toEndOf="parent"/>
 
 
 </android.support.constraint.ConstraintLayout>
