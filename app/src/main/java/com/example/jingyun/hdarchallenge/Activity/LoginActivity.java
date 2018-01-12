@@ -74,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(LoginActivity.this, "Logging In", Toast.LENGTH_SHORT).show();
                 userLogin();
             }
         });

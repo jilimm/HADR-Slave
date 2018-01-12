@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +25,7 @@ import com.example.jingyun.hdarchallenge.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -60,6 +62,7 @@ public class MessageFragment extends Fragment {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private FirebaseStorage storage;
     private int fileName=0;
+    private Location defaultLocation;
 
 
     private OnFragmentInteractionListener mListener;
@@ -113,6 +116,12 @@ public class MessageFragment extends Fragment {
         cameraPic = (ImageView) rootView.findViewById(R.id.msg_camera_img);
 
         final StorageReference storageReference = storage.getReference();
+        // Create file metadata including the content type
+
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setCustomMetadata("Message", msgEditText.getText().toString())
+                .build();
+        //attach the location
 
 
 
@@ -133,18 +142,20 @@ public class MessageFragment extends Fragment {
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
+                        Toast.makeText(getActivity(), "Failed to send message", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
+                        fileName++;
+                        cameraPic.setImageResource(R.drawable.ic_menu_camera);
+                        msgEditText.setText("");
                     }
                 });
-                Toast.makeText(getActivity(), "Notification Submitted", Toast.LENGTH_SHORT).show();
-                fileName++;
-                cameraPic.setImageResource(R.drawable.ic_menu_camera);
+
             }
         });
 

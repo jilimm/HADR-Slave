@@ -92,7 +92,7 @@ public class NavigationFragment extends Fragment implements LocationEngineListen
     private PermissionsManager permissionsManager;
     private LocationLayerPlugin locationPlugin;
     private LocationEngine locationEngine;
-    private Location currentLocation; //will be determine by locationEngine
+    public Location currentLocation; //will be determine by locationEngine
 
     //things needed to create and draw the navigation route
     private Position originPosition;
